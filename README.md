@@ -1,64 +1,57 @@
 # @datasworn-community/python-bindings
 
-Pydantic v2 models and typed ruleset loaders for [Datasworn](https://github.com/datasworn-community/datasworn) JSON.
+Pydantic v2 models for [Datasworn](https://github.com/datasworn-community/datasworn) content — Ironsworn / Starforged / Sundered Isles / Lodestar / Delve / community expansions.
 
-Use these to parse and validate Ironsworn / Starforged / Sundered Isles / Lodestar / Delve / community-expansion content into typed Python objects instead of raw `dict`.
+**Ships one thing: types.** JSON content lives in [`official-content`](https://github.com/datasworn-community/official-content) and [`community-content`](https://github.com/datasworn-community/community-content); this repo doesn't bundle a copy. That keeps the data single-source (Scott's concern from the initial review) — the Python package can't silently drift from what's actually published.
 
-## Install (from PyPI — coming soon)
-
-Each ruleset ships as its own PyPI package so you can pull only the rulesets your app cares about. Nothing is on PyPI yet — see the *Status* section below.
+## Install
 
 ```sh
-pip install datasworn-community-core          # types + Pydantic models (required by everything else)
-pip install datasworn-community-classic       # Ironsworn Classic ruleset JSON
-pip install datasworn-community-delve         # Ironsworn Delve
-pip install datasworn-community-lodestar      # Ironsworn Lodestar
-pip install datasworn-community-starforged    # Ironsworn Starforged
-pip install datasworn-community-sundered-isles
-pip install datasworn-community-starsmith
-pip install datasworn-community-ironsmith
-pip install datasworn-community-ancient-wonders
-pip install datasworn-community-fe-runners
+pip install datasworn-community-core     # (once published to PyPI)
 ```
 
-## Install (from git while PyPI is pending)
+Not yet on PyPI. In the meantime:
 
 ```sh
 uv add "datasworn-community-core @ git+https://github.com/datasworn-community/python-bindings.git#subdirectory=packages/core"
-uv add "datasworn-community-classic @ git+https://github.com/datasworn-community/python-bindings.git#subdirectory=packages/classic"
 ```
 
 ## Usage
 
+Load JSON however works for you — HTTP fetch, bundled asset, filesystem, npm package tarball — and hand it to `Ruleset.model_validate`:
+
 ```python
-import importlib
 import json
-from pathlib import Path
-from datasworn.core.models import Ruleset, Expansion
+import urllib.request
+from datasworn.core.models import Ruleset
 
-pkg = importlib.import_module("datasworn.starforged")
-json_file = Path(pkg.__file__).parent / "json" / "starforged.json"
+RAW = "https://raw.githubusercontent.com/datasworn-community/official-content/main/generated-datasworn/classic.json"
 
-with json_file.open() as f:
-    data = json.load(f)
+with urllib.request.urlopen(RAW) as response:
+    rules_json = json.load(response)
 
-rules: Ruleset = Ruleset.model_validate(data)
+rules: Ruleset = Ruleset.model_validate(rules_json)
 print(rules.id, len(rules.moves or {}), len(rules.oracles or {}))
 ```
 
-Note: **PyPI package names use hyphens** (`datasworn-community-classic`) but **Python import paths use dots** (`from datasworn.classic import ...`). This mirrors the `bs4` / `beautifulsoup4` convention.
+Note: **PyPI package name uses hyphens** (`datasworn-community-core`) but **Python import paths use dots** (`from datasworn.core.models import Ruleset`). This mirrors the `bs4` / `beautifulsoup4` convention.
 
 ## Status
 
-Functional against Pydantic 2.13, all 10 packages tested. Three codegen quirks from `datamodel-code-generator` are patched by `scripts/post_process_models.py` — run it after any `models.py` regeneration:
+Functional against Pydantic 2.13. Four codegen quirks from `datamodel-code-generator` are patched by `scripts/post_process_models.py` — re-run after any `models.py` regeneration:
 
-1. **String `pattern` constraint on `date` fields.** `SourceInfo.date` is typed as `datetime.date` but the schema's `pattern: "[0-9]{4}-…"` is emitted onto the `Field()`. Pydantic 2.13 rejects a string-only constraint on a non-string field. The post-processor strips just those patterns.
-2. **Empty `Features` / `Dangers` / `Denizens` stubs.** Codegen emits `class Denizens(BaseModel): pass` then references it where the JSON actually contains a list of concrete items. The post-processor rewrites the field types to `list[X]` and deletes the empty stubs.
-3. **`RootModel[str]` wrappers on ID types.** The generator wraps every `<ThingId>` in a `RootModel[str]` class, forcing consumers to write `some_thing.id.root` instead of `some_thing.id`. The post-processor converts each to `TypeAlias = Annotated[str, Field(pattern=…)]`, so IDs read as plain strings while Pydantic still validates the pattern on load.
+1. **`pattern` on `date` fields.** `SourceInfo.date` is typed `datetime.date` but the schema's `pattern: "[0-9]{4}-…"` is emitted onto the `Field()`. Pydantic 2.13 rejects a string-only constraint on a non-string field.
+2. **Empty `Features` / `Dangers` / `Denizens` stubs.** Codegen emits `class Denizens(BaseModel): pass` and references it where the JSON contains a list. The post-processor rewrites to `list[X]` and deletes the stubs.
+3. **`RootModel[str]` wrappers on ID types.** Every `<ThingId>` was a wrapper class forcing `some_thing.id.root`; converted to `TypeAlias = Annotated[str, Field(pattern=…)]` so `.id` reads as a plain str while Pydantic still validates the pattern on load.
+4. **Empty discriminated-union bases.** `Move`, `OracleRollable`, `OracleRollableTable`, `EmbeddedOracleRollable`, `OracleCollection` were empty base classes with `extra='allow'`; rewritten to `Annotated[Union[...], Field(discriminator=…)]` unions so real fields are attributes, not `__pydantic_extra__`.
+
+### Known drift ⚠️
+
+`models.py` here was regenerated from **schema line 0.1.0**. The content repos ship **schema 0.2.0** on `main`. Loading a live content payload today fails validation on `datasworn_version` (and probably a lot more). Fixing this = **regenerate `models.py` against the current `@datasworn-community/core` schema, then re-run the post-processor**. The end-to-end validation tests in `tests/test_load_rules_packages.py` are marked `xfail` until that happens; when the regen lands they should flip to green and the `xfail` markers should be removed.
 
 Still outstanding (nice-to-have, not blocking):
 
-- **Additional discriminated-union bases without generated subtypes.** `MoveEnhancement`, `EmbeddedMove`, `AssetControlField`, `AssetOptionField`, `RulesPackage`, `Choices`, `RollableValue`, and ~5 others share the same "empty base with `extra='allow'`" codegen quirk, but their concrete subtype classes weren't generated at all — so a post-process pass can't just wire them into a union yet. Needs upstream codegen work or a bigger post-processor.
+- **Additional discriminated-union bases without generated subtypes.** `MoveEnhancement`, `EmbeddedMove`, `AssetControlField`, `AssetOptionField`, `RulesPackage`, `Choices`, `RollableValue`, and ~5 others share the same "empty base with `extra='allow'`" quirk, but their concrete subtype classes weren't generated at all. Needs upstream codegen work.
 
 ## Development
 
@@ -69,20 +62,41 @@ uv sync
 uv run pytest -q tests/
 ```
 
-The workspace publishes 10 packages (1 core + 9 rulesets). Adding a new ruleset:
+Tests fetch the current content from `official-content` and `community-content` on first run, cache under `tests/.cache/`. Set `DATASWORN_TESTS_OFFLINE=1` to skip download attempts (they'll skip if not cached).
 
-1. Copy an existing ruleset directory under `packages/` and rename it (e.g. `cp -R packages/starsmith packages/new_ruleset`).
-2. Update the copy's `pyproject.toml` — `name`, `module-name`, and description.
-3. Rename the module directory under `src/` to match.
-4. Drop the correct `<ruleset>.json` into `src/.../json/`.
-5. Add the workspace member to root `pyproject.toml`'s `[tool.uv.workspace] members` and `[tool.uv.sources]`.
-6. Add the ruleset name to `OFFICIAL_PACKAGES` or `COMMUNITY_PACKAGES` in `tests/test_load_rules_packages.py`.
+## Regenerating `models.py`
+
+When `@datasworn-community/core` bumps its schema line:
+
+1. Download the current source schema:
+
+   ```sh
+   curl -sSL https://raw.githubusercontent.com/datasworn-community/datasworn/main/packages/core/json/datasworn-source.schema.json > /tmp/datasworn-source.schema.json
+   ```
+
+2. Regenerate `models.py` with datamodel-code-generator (or your preferred tool):
+
+   ```sh
+   uvx datamodel-code-generator \
+     --input /tmp/datasworn-source.schema.json \
+     --input-file-type jsonschema \
+     --output packages/core/src/datasworn/core/models.py \
+     --output-model-type pydantic_v2.BaseModel \
+     --target-python-version 3.14 \
+     --use-annotated
+   ```
+
+3. Re-run the post-processor:
+
+   ```sh
+   uv run python scripts/post_process_models.py
+   ```
+
+4. Run tests. The `xfail` markers on `test_load_rules_packages.py` should flip green — remove the markers, commit, publish a new core version.
 
 ## Provenance
 
-Ported from [`tbsvttr/datasworn` `pkg/python/`](https://github.com/tbsvttr/datasworn/tree/main/pkg/python) — the two nested workspaces (`datasworn/` and `datasworn-community-content/`) merged into a single flat workspace here for simpler consumer install.
-
-Original author: Gerhard Brandt (`gbrandt1`), who built the Pydantic binding on the fork.
+Ported from [`tbsvttr/datasworn` `pkg/python/`](https://github.com/tbsvttr/datasworn/tree/main/pkg/python) as one workspace. Original author: Gerhard Brandt (`gbrandt1`), who built the Pydantic binding on the fork.
 
 ## Related
 
