@@ -50,14 +50,15 @@ Note: **PyPI package names use hyphens** (`datasworn-community-classic`) but **P
 
 ## Status
 
-Functional against Pydantic 2.13, all 10 packages tested. Two known codegen bugs from `datamodel-code-generator` are patched by `scripts/post_process_models.py` — run it after any `models.py` regeneration:
+Functional against Pydantic 2.13, all 10 packages tested. Three codegen quirks from `datamodel-code-generator` are patched by `scripts/post_process_models.py` — run it after any `models.py` regeneration:
 
 1. **String `pattern` constraint on `date` fields.** `SourceInfo.date` is typed as `datetime.date` but the schema's `pattern: "[0-9]{4}-…"` is emitted onto the `Field()`. Pydantic 2.13 rejects a string-only constraint on a non-string field. The post-processor strips just those patterns.
-2. **Empty `Features` / `Dangers` / `Denizens` stubs.** Codegen emits `class Denizens(BaseModel): pass` and `class Features(BaseModel): pass`, then references them where the JSON actually contains a list of concrete items (`DelveSiteDenizen`, `DelveSiteDomainFeature`, `DelveSiteThemeFeature`, etc.). The post-processor rewrites the field types to `list[X]` and deletes the empty stubs.
+2. **Empty `Features` / `Dangers` / `Denizens` stubs.** Codegen emits `class Denizens(BaseModel): pass` then references it where the JSON actually contains a list of concrete items. The post-processor rewrites the field types to `list[X]` and deletes the empty stubs.
+3. **`RootModel[str]` wrappers on ID types.** The generator wraps every `<ThingId>` in a `RootModel[str]` class, forcing consumers to write `some_thing.id.root` instead of `some_thing.id`. The post-processor converts each to `TypeAlias = Annotated[str, Field(pattern=…)]`, so IDs read as plain strings while Pydantic still validates the pattern on load.
 
 Still outstanding (nice-to-have, not blocking):
 
-- **`RootModel[str]` wrappers on ID types.** `.id` currently reads via `._id`; a separate post-process step in the upstream fork converted these to plain type aliases (`RulesetId: TypeAlias = str`). Not ported yet.
+- **Additional discriminated-union bases without generated subtypes.** `MoveEnhancement`, `EmbeddedMove`, `AssetControlField`, `AssetOptionField`, `RulesPackage`, `Choices`, `RollableValue`, and ~5 others share the same "empty base with `extra='allow'`" codegen quirk, but their concrete subtype classes weren't generated at all — so a post-process pass can't just wire them into a union yet. Needs upstream codegen work or a bigger post-processor.
 
 ## Development
 
