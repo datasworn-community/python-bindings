@@ -8,11 +8,10 @@ authors = [
 ]
 requires-python = ">=3.14"
 dependencies = [
-    # 2.13 works because `scripts/post_process_models.py` rewrites two codegen
-    # bugs that 2.13 catches: string `pattern` constraints on `date` fields, and
-    # empty stub models where the generator should have emitted `list[X]`.
-    # Bumping past 2.13 requires re-running the post-processor after any
-    # models.py regeneration (see the script's docstring for details).
+    # 2.13 works because `scripts/post_process_models.py` rewrites five codegen
+    # misbehaviors that pydantic (correctly) rejects or that would leave real
+    # attributes stuck in `__pydantic_extra__`. See the script's docstring for
+    # the full list; re-run it after any models.py regeneration.
     "pydantic[email]>=2.13.4,<2.14",
 ]
 

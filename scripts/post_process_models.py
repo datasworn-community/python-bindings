@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
-"""Post-process the generated `models.py` to work around two codegen bugs.
+"""Post-process the generated `models.py` to work around five codegen bugs.
 
 Datamodel-code-generator (the upstream generator that builds `models.py` from
-`datasworn-source.schema.json`) has two known misbehaviors on our schema:
+`datasworn.schema.json`) has five known misbehaviors on our schema. All five
+fixes belong in a proper generator patch upstream — until then, this script
+runs against a freshly generated `models.py` and rewrites the patterns in
+place. Idempotent: running twice is a no-op on the second run.
 
 1. **String `pattern` on `date` fields.** The schema declares
    `SourceInfo.date` with `type: string, format: date, pattern: "[0-9]{4}-…"`.
@@ -11,16 +14,30 @@ Datamodel-code-generator (the upstream generator that builds `models.py` from
    Pydantic 2.13+ then rejects the schema at import time: a string-only
    `pattern` constraint on a non-string field is a Pydantic error.
 
-2. **Empty `Features` / `Dangers` stubs on `DelveSiteDomain` / `DelveSiteTheme`.**
-   The schema types these as arrays of `DelveSiteDomainFeature` /
-   `DelveSiteThemeFeature` (etc.), but datamodel-code-generator emits `class
-   Features(BaseModel): pass` and then references it as `features: Features`,
-   dropping the list-of-item shape entirely. Validating a real JSON payload
-   (which has an array of feature objects) then fails with `model_type` errors.
+2. **Empty `Features` / `Dangers` / `Denizens` stubs on `DelveSiteDomain` /
+   `DelveSiteTheme` / `DelveSite`.** The schema types these as arrays of
+   `DelveSiteDomainFeature` etc., but datamodel-code-generator emits
+   `class Features(BaseModel): pass` and references it where the JSON is a
+   list. Rewritten to `list[<Concrete>]`.
 
-Both fixes belong in a proper generator patch upstream — until then, this
-script runs against a freshly generated `models.py` and rewrites those two
-patterns in place. Idempotent: running twice is a no-op on the second run.
+3. **`RootModel[str]` wrappers on ID types.** Every `<ThingId>` gets emitted
+   as a `class Id(RootModel[str])` wrapper, forcing `.root` access on every
+   consumer. Rewritten to `TypeAlias = Annotated[str, Field(pattern=…)]` so
+   `.id` reads as a plain str while Pydantic still validates the pattern.
+
+4. **Empty discriminated-union base classes.** `Move`, `OracleRollable`,
+   `OracleRollableTable`, `EmbeddedOracleRollable`, `OracleCollection` come
+   out as empty bases with `extra='allow'` holding only the discriminator
+   field — every real attribute of a validated instance lands in
+   `__pydantic_extra__`. Rewritten to `Annotated[Union[...],
+   Field(discriminator=…)]` unions.
+
+5. **`_X` JSON keys renamed to `field_X` Python attrs.** Codegen renames
+   `_id`, `_source`, `_comment` to `field_id`, `field_source`, `field_comment`
+   because leading-underscore attribute names collide with pydantic's private
+   namespace. Renamed back to the natural attr name (dropping the `field_`
+   prefix) while keeping `Field(alias='_X')` intact so JSON validation still
+   works.
 
 Usage
     uv run scripts/post_process_models.py [path/to/models.py]
@@ -201,14 +218,27 @@ _ROOT_MODEL_STR_RE = re.compile(
     re.MULTILINE,
 )
 
+# Same shape but for the compact single-line variant the codegen emits when
+# the Field has no `pattern` (just description and title):
+#     class CssColor(RootModel[str]):
+#         root: Annotated[str, Field(description='...', title='CssColor')]
+_ROOT_MODEL_STR_INLINE_RE = re.compile(
+    r"^class (\w+)\(RootModel\[str\]\):\n"
+    r"    root: Annotated\[str, Field\((.+)\)\]\n",
+    re.MULTILINE,
+)
+
 
 def _rewrite_root_model_str(source: str) -> tuple[str, int]:
     """Rewrite each `class <Name>(RootModel[str]): root: Annotated[str, Field(…)]`
     block as `<Name>: TypeAlias = Annotated[str, Field(…)]`.
+
+    Handles both the multiline form (Field with `pattern=…` splits across
+    lines) and the compact single-line form (description-only fields).
     """
     hits = 0
 
-    def _sub(match: re.Match[str]) -> str:
+    def _sub_multiline(match: re.Match[str]) -> str:
         nonlocal hits
         hits += 1
         class_name = match.group(1)
@@ -228,7 +258,15 @@ def _rewrite_root_model_str(source: str) -> tuple[str, int]:
             f"]\n"
         )
 
-    new_source = _ROOT_MODEL_STR_RE.sub(_sub, source)
+    def _sub_inline(match: re.Match[str]) -> str:
+        nonlocal hits
+        hits += 1
+        class_name = match.group(1)
+        field_args = match.group(2)
+        return f"{class_name}: TypeAlias = Annotated[str, Field({field_args})]\n"
+
+    new_source = _ROOT_MODEL_STR_RE.sub(_sub_multiline, source)
+    new_source = _ROOT_MODEL_STR_INLINE_RE.sub(_sub_inline, new_source)
     return new_source, hits
 
 
@@ -388,6 +426,53 @@ def _ensure_union_import(source: str) -> str:
     return source[: match.start()] + new_line + source[match.end() :]
 
 
+# --- Fix 5: field_X → X rename for underscored JSON keys ---------------------
+#
+# JSON schema keys starting with `_` (`_id`, `_source`, `_comment`, …) get
+# renamed to `field_id`, `field_source`, `field_comment` by
+# datamodel-code-generator because leading-underscore attribute names collide
+# with pydantic's internal namespace. The alias is preserved (`Field(alias='_id')`)
+# so JSON validation still works, but users have to write `move.field_id`
+# instead of `move.id`, `move.field_source` instead of `move.source`, etc.
+#
+# This pass renames the Python attribute back to the natural name (drops the
+# `field_` prefix) while keeping the JSON alias intact. Safe because we only
+# rewrite when the surrounding `Field(alias='_X')` matches the same underscored
+# name — a stray `field_foo:` unrelated to any JSON `_foo` key stays untouched.
+
+# Matches:
+#     field_id: Annotated[
+#         ExpansionId,
+#         Field(alias='_id', ...more...),
+#     ]
+#
+# and captures the trailing target name so we can rewrite the attribute.
+_FIELD_RENAME_RE = re.compile(
+    r"^    field_(\w+):(\s+Annotated\[[\s\S]+?Field\(\s*alias=['\"]_(\w+)['\"])",
+    re.MULTILINE,
+)
+
+
+def _rewrite_underscored_field_names(source: str) -> tuple[str, int]:
+    """Drop the `field_` prefix on attributes whose Field alias matches
+    `_<same_name>`. Preserves the alias so JSON validation still works.
+    """
+    hits = 0
+
+    def _sub(match: re.Match[str]) -> str:
+        nonlocal hits
+        attr_name = match.group(1)
+        alias_target = match.group(3)
+        if attr_name != alias_target:
+            # Attr is `field_X` but alias is `_Y` — don't touch.
+            return match.group(0)
+        hits += 1
+        return f"    {attr_name}:{match.group(2)}"
+
+    new_source = _FIELD_RENAME_RE.sub(_sub, source)
+    return new_source, hits
+
+
 # --- driver -----------------------------------------------------------------
 
 
@@ -412,16 +497,18 @@ def main(argv: list[str]) -> int:
     if union_hits > 0:
         after_unions = _ensure_type_alias_import(after_unions)
         after_unions = _ensure_union_import(after_unions)
+    after_renames, rename_hits = _rewrite_underscored_field_names(after_unions)
 
-    if after_unions == original:
+    if after_renames == original:
         print(f"{path}: no changes (already post-processed)")
         return 0
 
-    path.write_text(after_unions, encoding="utf-8")
+    path.write_text(after_renames, encoding="utf-8")
     print(
         f"{path}: stripped {date_hits} date-field pattern(s), "
         f"converted {alias_hits} RootModel[str] wrapper(s) to TypeAlias, "
         f"resolved {union_hits} discriminated-union base(s), "
+        f"renamed {rename_hits} `field_X` attribute(s), "
         f"rewrote {feature_hits} Features/Dangers stub site(s)"
     )
     return 0
