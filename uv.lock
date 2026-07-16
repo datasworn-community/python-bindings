@@ -4,17 +4,8 @@ requires-python = ">=3.14"
 
 [manifest]
 members = [
-    "datasworn-community-ancient-wonders",
-    "datasworn-community-classic",
     "datasworn-community-core",
-    "datasworn-community-delve",
-    "datasworn-community-fe-runners",
-    "datasworn-community-ironsmith",
-    "datasworn-community-lodestar",
     "datasworn-community-python-bindings",
-    "datasworn-community-starforged",
-    "datasworn-community-starsmith",
-    "datasworn-community-sundered-isles",
 ]
 
 [[package]]
@@ -36,16 +27,6 @@ wheels = [
 ]
 
 [[package]]
-name = "datasworn-community-ancient-wonders"
-version = "0.1.0"
-source = { editable = "packages/ancient_wonders" }
-
-[[package]]
-name = "datasworn-community-classic"
-version = "0.1.0"
-source = { editable = "packages/classic" }
-
-[[package]]
 name = "datasworn-community-core"
 version = "0.1.0"
 source = { editable = "packages/core" }
@@ -57,42 +38,13 @@ dependencies = [
 requires-dist = [{ name = "pydantic", extras = ["email"], specifier = ">=2.13.4,<2.14" }]
 
 [[package]]
-name = "datasworn-community-delve"
-version = "0.1.0"
-source = { editable = "packages/delve" }
-
-[[package]]
-name = "datasworn-community-fe-runners"
-version = "0.1.0"
-source = { editable = "packages/fe_runners" }
-
-[[package]]
-name = "datasworn-community-ironsmith"
-version = "0.1.0"
-source = { editable = "packages/ironsmith" }
-
-[[package]]
-name = "datasworn-community-lodestar"
-version = "0.1.0"
-source = { editable = "packages/lodestar" }
-
-[[package]]
 name = "datasworn-community-python-bindings"
 version = "0.1.0"
 source = { virtual = "." }
 
 [package.dev-dependencies]
 dev = [
-    { name = "datasworn-community-ancient-wonders" },
-    { name = "datasworn-community-classic" },
     { name = "datasworn-community-core" },
-    { name = "datasworn-community-delve" },
-    { name = "datasworn-community-fe-runners" },
-    { name = "datasworn-community-ironsmith" },
-    { name = "datasworn-community-lodestar" },
-    { name = "datasworn-community-starforged" },
-    { name = "datasworn-community-starsmith" },
-    { name = "datasworn-community-sundered-isles" },
     { name = "pytest" },
 ]
 
@@ -100,33 +52,9 @@ dev = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "datasworn-community-ancient-wonders", editable = "packages/ancient_wonders" },
-    { name = "datasworn-community-classic", editable = "packages/classic" },
     { name = "datasworn-community-core", editable = "packages/core" },
-    { name = "datasworn-community-delve", editable = "packages/delve" },
-    { name = "datasworn-community-fe-runners", editable = "packages/fe_runners" },
-    { name = "datasworn-community-ironsmith", editable = "packages/ironsmith" },
-    { name = "datasworn-community-lodestar", editable = "packages/lodestar" },
-    { name = "datasworn-community-starforged", editable = "packages/starforged" },
-    { name = "datasworn-community-starsmith", editable = "packages/starsmith" },
-    { name = "datasworn-community-sundered-isles", editable = "packages/sundered_isles" },
     { name = "pytest", specifier = ">=9.1.1" },
 ]
-
-[[package]]
-name = "datasworn-community-starforged"
-version = "0.1.0"
-source = { editable = "packages/starforged" }
-
-[[package]]
-name = "datasworn-community-starsmith"
-version = "0.1.0"
-source = { editable = "packages/starsmith" }
-
-[[package]]
-name = "datasworn-community-sundered-isles"
-version = "0.1.0"
-source = { editable = "packages/sundered_isles" }
 
 [[package]]
 name = "dnspython"

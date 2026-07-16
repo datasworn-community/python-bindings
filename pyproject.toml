@@ -1,52 +1,23 @@
 [project]
 name = "datasworn-community-python-bindings"
 version = "0.1.0"
-description = "Pydantic v2 models and typed ruleset loaders for Datasworn JSON — Ironsworn/Starforged/expansions."
+description = "Pydantic v2 models for Datasworn — Ironsworn / Starforged / expansions."
 readme = "README.md"
 requires-python = ">=3.14"
-# The root project doesn't publish; each workspace member does.
+# The root project doesn't publish; the single workspace member `core` does.
 
 [tool.uv]
 managed = true
 package = false  # virtual workspace root
 
 [tool.uv.workspace]
-members = [
-    "packages/core",
-    "packages/classic",
-    "packages/delve",
-    "packages/lodestar",
-    "packages/starforged",
-    "packages/sundered_isles",
-    "packages/ancient_wonders",
-    "packages/fe_runners",
-    "packages/ironsmith",
-    "packages/starsmith",
-]
+members = ["packages/core"]
 
 [tool.uv.sources]
 datasworn-community-core = { workspace = true }
-datasworn-community-classic = { workspace = true }
-datasworn-community-delve = { workspace = true }
-datasworn-community-lodestar = { workspace = true }
-datasworn-community-starforged = { workspace = true }
-datasworn-community-sundered-isles = { workspace = true }
-datasworn-community-ancient-wonders = { workspace = true }
-datasworn-community-fe-runners = { workspace = true }
-datasworn-community-ironsmith = { workspace = true }
-datasworn-community-starsmith = { workspace = true }
 
 [dependency-groups]
 dev = [
     "datasworn-community-core",
-    "datasworn-community-classic",
-    "datasworn-community-delve",
-    "datasworn-community-lodestar",
-    "datasworn-community-starforged",
-    "datasworn-community-sundered-isles",
-    "datasworn-community-ancient-wonders",
-    "datasworn-community-fe-runners",
-    "datasworn-community-ironsmith",
-    "datasworn-community-starsmith",
     "pytest>=9.1.1",
 ]
