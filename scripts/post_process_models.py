@@ -162,6 +162,232 @@ def _rewrite_stub_fields(source: str) -> tuple[str, int]:
     return new_source, hits + stub_hits
 
 
+# --- Fix 3: RootModel[str] wrappers → TypeAlias -----------------------------
+#
+# The generator emits every ID type as a class:
+#
+#     class AssetAbilityId(RootModel[str]):
+#         root: Annotated[
+#             str,
+#             Field(
+#                 description='A unique ID representing an AssetAbility object.',
+#                 pattern='^asset\\.ability:...',
+#                 title='AssetAbilityId',
+#             ),
+#         ]
+#
+# Which forces every consumer to write `some_asset.id.root` instead of
+# `some_asset.id`. Converting these to type aliases with the pattern preserved
+# via `Annotated` gives back the ergonomic path (`.id` is a plain string) while
+# keeping Pydantic validation on the pattern intact — Pydantic honors
+# `Annotated[str, Field(pattern=...)]` inside model fields the same as it
+# honors `RootModel[str]`.
+#
+# We deliberately only convert the `RootModel[str]` variant. `RootModel[int]`,
+# `RootModel[list[X]]`, and `RootModel[Union[A, B]]` all have runtime shape
+# that a plain type alias can't replicate — they stay untouched.
+
+# Matches an entire `class <Name>(RootModel[str]):\n    root: Annotated[\n
+# str,\n        Field(\n            <kwargs...>,\n        ),\n    ]` block and
+# captures the class name and the Field kwargs.
+_ROOT_MODEL_STR_RE = re.compile(
+    r"^class (\w+)\(RootModel\[str\]\):\n"
+    r"    root: Annotated\[\n"
+    r"        str,\n"
+    r"        Field\(\n"
+    r"((?:            .+\n)+)"
+    r"        \),\n"
+    r"    \]\n",
+    re.MULTILINE,
+)
+
+
+def _rewrite_root_model_str(source: str) -> tuple[str, int]:
+    """Rewrite each `class <Name>(RootModel[str]): root: Annotated[str, Field(…)]`
+    block as `<Name>: TypeAlias = Annotated[str, Field(…)]`.
+    """
+    hits = 0
+
+    def _sub(match: re.Match[str]) -> str:
+        nonlocal hits
+        hits += 1
+        class_name = match.group(1)
+        field_kwargs_block = match.group(2)
+        # The kwargs are already indented 12 spaces. Re-indent to 4 for the
+        # inline Field(…) call in the alias.
+        deindented = "\n".join(
+            line[8:] if line.startswith(" " * 8) else line
+            for line in field_kwargs_block.rstrip("\n").split("\n")
+        )
+        return (
+            f"{class_name}: TypeAlias = Annotated[\n"
+            f"    str,\n"
+            f"    Field(\n"
+            f"{deindented}\n"
+            f"    ),\n"
+            f"]\n"
+        )
+
+    new_source = _ROOT_MODEL_STR_RE.sub(_sub, source)
+    return new_source, hits
+
+
+def _ensure_type_alias_import(source: str) -> str:
+    """Make sure `TypeAlias` is imported from `typing`. Adds it if missing."""
+    # Existing typing import line.
+    typing_import_re = re.compile(r"^from typing import (.+)$", re.MULTILINE)
+    match = typing_import_re.search(source)
+    if not match:
+        return source  # unusual — bail
+    names = [n.strip() for n in match.group(1).split(",")]
+    if "TypeAlias" in names:
+        return source
+    names.append("TypeAlias")
+    names.sort()
+    new_line = "from typing import " + ", ".join(names)
+    return source[: match.start()] + new_line + source[match.end() :]
+
+
+# --- Fix 4: resolve empty discriminated-union base classes ------------------
+#
+# The generator emits every discriminated union in the schema as an empty base
+# class with `extra='allow'`, holding only the discriminator field:
+#
+#     class Move(BaseModel):
+#         model_config = ConfigDict(extra='allow')
+#         roll_type: RollType
+#
+# The concrete subtype classes (MoveActionRoll, MoveNoRoll, …) *do* get
+# generated, they're just not wired up. Fields typed as `Move` end up
+# validating against the empty base — every actual field on the concrete
+# subtype lands in `__pydantic_extra__` instead of as an attribute. So
+# `move.id` doesn't work; you have to reach `move.__pydantic_extra__["_id"]`.
+#
+# Fix: replace each broken base with a discriminated `Annotated[Union[…],
+# Field(discriminator=…)]` alias. Forward-ref subtypes as strings because the
+# concrete subclass definitions come later in the file.
+#
+# Not exhaustive — we handle the four bases whose subtype classes actually
+# exist in the generated output. Bases like `MoveEnhancement`, `EmbeddedMove`,
+# `RulesPackage`, `AssetControlField` etc. also have the same shape but their
+# subtype classes weren't generated at all; fixing those needs upstream
+# codegen work.
+
+_DISCRIMINATED_UNIONS: list[tuple[str, str, str, list[str]]] = [
+    # (base_class, discriminator_field, discriminator_type_alias, subtype_class_names)
+    (
+        "Move",
+        "roll_type",
+        "RollType",
+        ["MoveActionRoll", "MoveNoRoll", "MoveProgressRoll", "MoveSpecialTrack"],
+    ),
+    (
+        "OracleRollable",
+        "oracle_type",
+        "OracleType2",
+        [
+            "OracleColumnText",
+            "OracleColumnText2",
+            "OracleColumnText3",
+            "OracleTableText",
+            "OracleTableText2",
+            "OracleTableText3",
+        ],
+    ),
+    (
+        "EmbeddedOracleRollable",
+        "oracle_type",
+        "OracleType",
+        [
+            "EmbeddedOracleColumnText",
+            "EmbeddedOracleColumnText2",
+            "EmbeddedOracleColumnText3",
+            "EmbeddedOracleTableText",
+            "EmbeddedOracleTableText2",
+            "EmbeddedOracleTableText3",
+        ],
+    ),
+    (
+        "OracleCollection",
+        "oracle_type",
+        "OracleType1",
+        [
+            "OracleTablesCollection",
+            "OracleTableSharedRolls",
+            "OracleTableSharedText",
+            "OracleTableSharedText2",
+            "OracleTableSharedText3",
+        ],
+    ),
+    (
+        # Nested union inside OracleRollable — codegen emits it as its own
+        # empty base with the `table_*` variants underneath. OracleCollection's
+        # `contents` field type-refs OracleRollableTable directly, so this
+        # matters even after OracleRollable is unioned.
+        "OracleRollableTable",
+        "oracle_type",
+        "OracleType3",
+        ["OracleTableText", "OracleTableText2", "OracleTableText3"],
+    ),
+]
+
+
+def _rewrite_discriminated_union_bases(source: str) -> tuple[str, int]:
+    """Replace each broken empty discriminated-union base with a proper
+    `Annotated[Union[...], Field(discriminator=…)]` alias.
+
+    Uses string forward references for subtype names since the concrete
+    subclass definitions come later in the generated file.
+    """
+    hits = 0
+    for base, disc, disc_type, subtypes in _DISCRIMINATED_UNIONS:
+        # Expected shape of the broken base:
+        #     class Move(BaseModel):
+        #         model_config = ConfigDict(
+        #             extra='allow',
+        #         )
+        #         roll_type: RollType
+        #
+        # No other fields — that's what makes it the broken pattern rather than
+        # a legit base with `extra='allow'` (like SourceInfo, Ruleset, etc.).
+        expected = (
+            f"class {base}(BaseModel):\n"
+            f"    model_config = ConfigDict(\n"
+            f"        extra='allow',\n"
+            f"    )\n"
+            f"    {disc}: {disc_type}\n"
+        )
+        if expected not in source:
+            continue
+        union_members = ", ".join(f'"{s}"' for s in subtypes)
+        replacement = (
+            f"{base}: TypeAlias = Annotated[\n"
+            f"    Union[{union_members}],\n"
+            f'    Field(discriminator="{disc}"),\n'
+            f"]\n"
+        )
+        source = source.replace(expected, replacement, 1)
+        hits += 1
+    return source, hits
+
+
+def _ensure_union_import(source: str) -> str:
+    """Make sure `Union` is imported from `typing` (used by the discriminated
+    union rewrite; may already be imported or not depending on the schema).
+    """
+    typing_import_re = re.compile(r"^from typing import (.+)$", re.MULTILINE)
+    match = typing_import_re.search(source)
+    if not match:
+        return source
+    names = [n.strip() for n in match.group(1).split(",")]
+    if "Union" in names:
+        return source
+    names.append("Union")
+    names.sort()
+    new_line = "from typing import " + ", ".join(names)
+    return source[: match.start()] + new_line + source[match.end() :]
+
+
 # --- driver -----------------------------------------------------------------
 
 
@@ -179,14 +405,23 @@ def main(argv: list[str]) -> int:
 
     after_date, date_hits = _strip_date_patterns(original)
     after_features, feature_hits = _rewrite_stub_fields(after_date)
+    after_aliases, alias_hits = _rewrite_root_model_str(after_features)
+    if alias_hits > 0:
+        after_aliases = _ensure_type_alias_import(after_aliases)
+    after_unions, union_hits = _rewrite_discriminated_union_bases(after_aliases)
+    if union_hits > 0:
+        after_unions = _ensure_type_alias_import(after_unions)
+        after_unions = _ensure_union_import(after_unions)
 
-    if after_features == original:
+    if after_unions == original:
         print(f"{path}: no changes (already post-processed)")
         return 0
 
-    path.write_text(after_features, encoding="utf-8")
+    path.write_text(after_unions, encoding="utf-8")
     print(
         f"{path}: stripped {date_hits} date-field pattern(s), "
+        f"converted {alias_hits} RootModel[str] wrapper(s) to TypeAlias, "
+        f"resolved {union_hits} discriminated-union base(s), "
         f"rewrote {feature_hits} Features/Dangers stub site(s)"
     )
     return 0

@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from datetime import date as date_aliased
 from enum import Enum
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any, Literal, TypeAlias, Union
 
 from pydantic import AnyUrl, BaseModel, ConfigDict, EmailStr, Field, RootModel
 
@@ -35,92 +35,84 @@ class AssetAbilityControlField(BaseModel):
     field_type: FieldType
 
 
-class AssetAbilityId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing an AssetAbility object.',
-            pattern='^asset\\.ability:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})\\.(\\d+)$',
-            title='AssetAbilityId',
-        ),
-    ]
+AssetAbilityId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing an AssetAbility object.',
+    pattern='^asset\\.ability:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})\\.(\\d+)$',
+    title='AssetAbilityId',
+    ),
+]
 
 
-class AssetAbilityIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded AssetAbilityId that can be used to match multiple AssetAbility objects.',
-            pattern='^asset\\.ability:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})\\.(\\d+|\\*)$',
-            title='AssetAbilityIdWildcard',
-        ),
-    ]
+AssetAbilityIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded AssetAbilityId that can be used to match multiple AssetAbility objects.',
+    pattern='^asset\\.ability:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})\\.(\\d+|\\*)$',
+    title='AssetAbilityIdWildcard',
+    ),
+]
 
 
-class AssetAbilityMoveConditionId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing an AssetAbilityMoveCondition object.',
-            pattern='^asset\\.ability\\.move\\.condition:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})\\.(\\d+)\\.([a-z][a-z0-9_]*|\\*)\\.(\\d+)$',
-            title='AssetAbilityMoveConditionId',
-        ),
-    ]
+AssetAbilityMoveConditionId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing an AssetAbilityMoveCondition object.',
+    pattern='^asset\\.ability\\.move\\.condition:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})\\.(\\d+)\\.([a-z][a-z0-9_]*|\\*)\\.(\\d+)$',
+    title='AssetAbilityMoveConditionId',
+    ),
+]
 
 
-class AssetAbilityMoveConditionIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded AssetAbilityMoveConditionId that can be used to match multiple AssetAbilityMoveCondition objects.',
-            pattern='^asset\\.ability\\.move\\.condition:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})\\.(\\d+|\\*)\\.([a-z][a-z0-9_]*|\\*)\\.(\\d+|\\*)$',
-            title='AssetAbilityMoveConditionIdWildcard',
-        ),
-    ]
+AssetAbilityMoveConditionIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded AssetAbilityMoveConditionId that can be used to match multiple AssetAbilityMoveCondition objects.',
+    pattern='^asset\\.ability\\.move\\.condition:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})\\.(\\d+|\\*)\\.([a-z][a-z0-9_]*|\\*)\\.(\\d+|\\*)$',
+    title='AssetAbilityMoveConditionIdWildcard',
+    ),
+]
 
 
-class AssetAbilityMoveId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing an AssetAbilityMove object.',
-            pattern='^asset\\.ability\\.move:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})\\.(\\d+)\\.([a-z][a-z0-9_]*|\\*)$',
-            title='AssetAbilityMoveId',
-        ),
-    ]
+AssetAbilityMoveId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing an AssetAbilityMove object.',
+    pattern='^asset\\.ability\\.move:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})\\.(\\d+)\\.([a-z][a-z0-9_]*|\\*)$',
+    title='AssetAbilityMoveId',
+    ),
+]
 
 
-class AssetAbilityMoveIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded AssetAbilityMoveId that can be used to match multiple AssetAbilityMove objects.',
-            pattern='^asset\\.ability\\.move:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})\\.(\\d+|\\*)\\.([a-z][a-z0-9_]*|\\*)$',
-            title='AssetAbilityMoveIdWildcard',
-        ),
-    ]
+AssetAbilityMoveIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded AssetAbilityMoveId that can be used to match multiple AssetAbilityMove objects.',
+    pattern='^asset\\.ability\\.move:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})\\.(\\d+|\\*)\\.([a-z][a-z0-9_]*|\\*)$',
+    title='AssetAbilityMoveIdWildcard',
+    ),
+]
 
 
-class AssetAbilityMoveOutcomeId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing an AssetAbilityMoveOutcome object.',
-            pattern='^asset\\.ability\\.move\\.outcome:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})\\.(\\d+)\\.([a-z][a-z0-9_]*|\\*)\\.([a-z][a-z0-9_]*|\\*)$',
-            title='AssetAbilityMoveOutcomeId',
-        ),
-    ]
+AssetAbilityMoveOutcomeId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing an AssetAbilityMoveOutcome object.',
+    pattern='^asset\\.ability\\.move\\.outcome:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})\\.(\\d+)\\.([a-z][a-z0-9_]*|\\*)\\.([a-z][a-z0-9_]*|\\*)$',
+    title='AssetAbilityMoveOutcomeId',
+    ),
+]
 
 
-class AssetAbilityMoveOutcomeIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded AssetAbilityMoveOutcomeId that can be used to match multiple AssetAbilityMoveOutcome objects.',
-            pattern='^asset\\.ability\\.move\\.outcome:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})\\.(\\d+|\\*)\\.([a-z][a-z0-9_]*|\\*)\\.([a-z][a-z0-9_]*|\\*)$',
-            title='AssetAbilityMoveOutcomeIdWildcard',
-        ),
-    ]
+AssetAbilityMoveOutcomeIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded AssetAbilityMoveOutcomeId that can be used to match multiple AssetAbilityMoveOutcome objects.',
+    pattern='^asset\\.ability\\.move\\.outcome:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})\\.(\\d+|\\*)\\.([a-z][a-z0-9_]*|\\*)\\.([a-z][a-z0-9_]*|\\*)$',
+    title='AssetAbilityMoveOutcomeIdWildcard',
+    ),
+]
 
 
 class FieldType1(Enum):
@@ -134,48 +126,44 @@ class AssetAbilityOptionField(BaseModel):
     field_type: FieldType1
 
 
-class AssetAbilityOracleRollableId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing an AssetAbilityOracleRollable object.',
-            pattern='^asset\\.ability\\.oracle_rollable:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})\\.(\\d+)\\.([a-z][a-z0-9_]*|\\*)$',
-            title='AssetAbilityOracleRollableId',
-        ),
-    ]
+AssetAbilityOracleRollableId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing an AssetAbilityOracleRollable object.',
+    pattern='^asset\\.ability\\.oracle_rollable:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})\\.(\\d+)\\.([a-z][a-z0-9_]*|\\*)$',
+    title='AssetAbilityOracleRollableId',
+    ),
+]
 
 
-class AssetAbilityOracleRollableIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded AssetAbilityOracleRollableId that can be used to match multiple AssetAbilityOracleRollable objects.',
-            pattern='^asset\\.ability\\.oracle_rollable:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})\\.(\\d+|\\*)\\.([a-z][a-z0-9_]*|\\*)$',
-            title='AssetAbilityOracleRollableIdWildcard',
-        ),
-    ]
+AssetAbilityOracleRollableIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded AssetAbilityOracleRollableId that can be used to match multiple AssetAbilityOracleRollable objects.',
+    pattern='^asset\\.ability\\.oracle_rollable:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})\\.(\\d+|\\*)\\.([a-z][a-z0-9_]*|\\*)$',
+    title='AssetAbilityOracleRollableIdWildcard',
+    ),
+]
 
 
-class AssetAbilityOracleRollableRowId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing an AssetAbilityOracleRollableRow object.',
-            pattern='^asset\\.ability\\.oracle_rollable\\.row:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})\\.(\\d+)\\.([a-z][a-z0-9_]*|\\*)\\.(\\d+)$',
-            title='AssetAbilityOracleRollableRowId',
-        ),
-    ]
+AssetAbilityOracleRollableRowId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing an AssetAbilityOracleRollableRow object.',
+    pattern='^asset\\.ability\\.oracle_rollable\\.row:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})\\.(\\d+)\\.([a-z][a-z0-9_]*|\\*)\\.(\\d+)$',
+    title='AssetAbilityOracleRollableRowId',
+    ),
+]
 
 
-class AssetAbilityOracleRollableRowIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded AssetAbilityOracleRollableRowId that can be used to match multiple AssetAbilityOracleRollableRow objects.',
-            pattern='^asset\\.ability\\.oracle_rollable\\.row:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})\\.(\\d+|\\*)\\.([a-z][a-z0-9_]*|\\*)\\.(\\d+|\\*)$',
-            title='AssetAbilityOracleRollableRowIdWildcard',
-        ),
-    ]
+AssetAbilityOracleRollableRowIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded AssetAbilityOracleRollableRowId that can be used to match multiple AssetAbilityOracleRollableRow objects.',
+    pattern='^asset\\.ability\\.oracle_rollable\\.row:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})\\.(\\d+|\\*)\\.([a-z][a-z0-9_]*|\\*)\\.(\\d+|\\*)$',
+    title='AssetAbilityOracleRollableRowIdWildcard',
+    ),
+]
 
 
 class Max(RootModel[int]):
@@ -188,26 +176,24 @@ class Max(RootModel[int]):
     ] = None
 
 
-class AssetCollectionId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing an AssetCollection object.',
-            pattern='^asset_collection:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){1,4})$',
-            title='AssetCollectionId',
-        ),
-    ]
+AssetCollectionId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing an AssetCollection object.',
+    pattern='^asset_collection:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){1,4})$',
+    title='AssetCollectionId',
+    ),
+]
 
 
-class AssetCollectionIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded AssetCollectionId that can be used to match multiple AssetCollection objects.',
-            pattern='^asset_collection:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){1,4})$',
-            title='AssetCollectionIdWildcard',
-        ),
-    ]
+AssetCollectionIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded AssetCollectionId that can be used to match multiple AssetCollection objects.',
+    pattern='^asset_collection:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){1,4})$',
+    title='AssetCollectionIdWildcard',
+    ),
+]
 
 
 class FieldType2(Enum):
@@ -252,26 +238,24 @@ class AssetControlFieldEnhancement(BaseModel):
     field_type: FieldType4
 
 
-class AssetId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing an Asset object.',
-            pattern='^asset:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})$',
-            title='AssetId',
-        ),
-    ]
+AssetId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing an Asset object.',
+    pattern='^asset:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})$',
+    title='AssetId',
+    ),
+]
 
 
-class AssetIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded AssetId that can be used to match multiple Asset objects.',
-            pattern='^asset:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})$',
-            title='AssetIdWildcard',
-        ),
-    ]
+AssetIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded AssetId that can be used to match multiple Asset objects.',
+    pattern='^asset:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})$',
+    title='AssetIdWildcard',
+    ),
+]
 
 
 class FieldType5(Enum):
@@ -287,48 +271,44 @@ class AssetOptionField(BaseModel):
     field_type: FieldType5
 
 
-class AtlasCollectionId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing an AtlasCollection object.',
-            pattern='^atlas_collection:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){1,4})$',
-            title='AtlasCollectionId',
-        ),
-    ]
+AtlasCollectionId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing an AtlasCollection object.',
+    pattern='^atlas_collection:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){1,4})$',
+    title='AtlasCollectionId',
+    ),
+]
 
 
-class AtlasCollectionIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded AtlasCollectionId that can be used to match multiple AtlasCollection objects.',
-            pattern='^atlas_collection:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){1,4})$',
-            title='AtlasCollectionIdWildcard',
-        ),
-    ]
+AtlasCollectionIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded AtlasCollectionId that can be used to match multiple AtlasCollection objects.',
+    pattern='^atlas_collection:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){1,4})$',
+    title='AtlasCollectionIdWildcard',
+    ),
+]
 
 
-class AtlasEntryId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing an AtlasEntry object.',
-            pattern='^atlas_entry:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})$',
-            title='AtlasEntryId',
-        ),
-    ]
+AtlasEntryId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing an AtlasEntry object.',
+    pattern='^atlas_entry:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})$',
+    title='AtlasEntryId',
+    ),
+]
 
 
-class AtlasEntryIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded AtlasEntryId that can be used to match multiple AtlasEntry objects.',
-            pattern='^atlas_entry:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})$',
-            title='AtlasEntryIdWildcard',
-        ),
-    ]
+AtlasEntryIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded AtlasEntryId that can be used to match multiple AtlasEntry objects.',
+    pattern='^atlas_entry:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})$',
+    title='AtlasEntryIdWildcard',
+    ),
+]
 
 
 class ChallengeRank(Enum):
@@ -385,194 +365,177 @@ class DelveSiteDenizenFrequency(Enum):
     unforeseen = 'unforeseen'
 
 
-class DelveSiteDenizenId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing a DelveSiteDenizen object.',
-            pattern='^delve_site\\.denizen:([a-z][a-z0-9_]*\\/[a-z][a-z0-9_]*)\\.(\\d+)$',
-            title='DelveSiteDenizenId',
-        ),
-    ]
+DelveSiteDenizenId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing a DelveSiteDenizen object.',
+    pattern='^delve_site\\.denizen:([a-z][a-z0-9_]*\\/[a-z][a-z0-9_]*)\\.(\\d+)$',
+    title='DelveSiteDenizenId',
+    ),
+]
 
 
-class DelveSiteDenizenIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded DelveSiteDenizenId that can be used to match multiple DelveSiteDenizen objects.',
-            pattern='^delve_site\\.denizen:((?:[a-z][a-z0-9_]*|\\*)\\/[a-z][a-z0-9_]*|\\/\\*|\\/\\*\\*)\\.(\\d+|\\*)$',
-            title='DelveSiteDenizenIdWildcard',
-        ),
-    ]
+DelveSiteDenizenIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded DelveSiteDenizenId that can be used to match multiple DelveSiteDenizen objects.',
+    pattern='^delve_site\\.denizen:((?:[a-z][a-z0-9_]*|\\*)\\/[a-z][a-z0-9_]*|\\/\\*|\\/\\*\\*)\\.(\\d+|\\*)$',
+    title='DelveSiteDenizenIdWildcard',
+    ),
+]
 
 
 
 
-class DelveSiteDomainDangerId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing a DelveSiteDomainDanger object.',
-            pattern='^delve_site_domain\\.danger:([a-z][a-z0-9_]*\\/[a-z][a-z0-9_]*)\\.(\\d+)$',
-            title='DelveSiteDomainDangerId',
-        ),
-    ]
+DelveSiteDomainDangerId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing a DelveSiteDomainDanger object.',
+    pattern='^delve_site_domain\\.danger:([a-z][a-z0-9_]*\\/[a-z][a-z0-9_]*)\\.(\\d+)$',
+    title='DelveSiteDomainDangerId',
+    ),
+]
 
 
-class DelveSiteDomainDangerIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded DelveSiteDomainDangerId that can be used to match multiple DelveSiteDomainDanger objects.',
-            pattern='^delve_site_domain\\.danger:((?:[a-z][a-z0-9_]*|\\*)\\/[a-z][a-z0-9_]*|\\/\\*|\\/\\*\\*)\\.(\\d+|\\*)$',
-            title='DelveSiteDomainDangerIdWildcard',
-        ),
-    ]
+DelveSiteDomainDangerIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded DelveSiteDomainDangerId that can be used to match multiple DelveSiteDomainDanger objects.',
+    pattern='^delve_site_domain\\.danger:((?:[a-z][a-z0-9_]*|\\*)\\/[a-z][a-z0-9_]*|\\/\\*|\\/\\*\\*)\\.(\\d+|\\*)$',
+    title='DelveSiteDomainDangerIdWildcard',
+    ),
+]
 
 
-class DelveSiteDomainFeatureId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing a DelveSiteDomainFeature object.',
-            pattern='^delve_site_domain\\.feature:([a-z][a-z0-9_]*\\/[a-z][a-z0-9_]*)\\.(\\d+)$',
-            title='DelveSiteDomainFeatureId',
-        ),
-    ]
+DelveSiteDomainFeatureId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing a DelveSiteDomainFeature object.',
+    pattern='^delve_site_domain\\.feature:([a-z][a-z0-9_]*\\/[a-z][a-z0-9_]*)\\.(\\d+)$',
+    title='DelveSiteDomainFeatureId',
+    ),
+]
 
 
-class DelveSiteDomainFeatureIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded DelveSiteDomainFeatureId that can be used to match multiple DelveSiteDomainFeature objects.',
-            pattern='^delve_site_domain\\.feature:((?:[a-z][a-z0-9_]*|\\*)\\/[a-z][a-z0-9_]*|\\/\\*|\\/\\*\\*)\\.(\\d+|\\*)$',
-            title='DelveSiteDomainFeatureIdWildcard',
-        ),
-    ]
+DelveSiteDomainFeatureIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded DelveSiteDomainFeatureId that can be used to match multiple DelveSiteDomainFeature objects.',
+    pattern='^delve_site_domain\\.feature:((?:[a-z][a-z0-9_]*|\\*)\\/[a-z][a-z0-9_]*|\\/\\*|\\/\\*\\*)\\.(\\d+|\\*)$',
+    title='DelveSiteDomainFeatureIdWildcard',
+    ),
+]
 
 
-class DelveSiteDomainId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing a DelveSiteDomain object.',
-            pattern='^delve_site_domain:([a-z][a-z0-9_]*\\/[a-z][a-z0-9_]*)$',
-            title='DelveSiteDomainId',
-        ),
-    ]
+DelveSiteDomainId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing a DelveSiteDomain object.',
+    pattern='^delve_site_domain:([a-z][a-z0-9_]*\\/[a-z][a-z0-9_]*)$',
+    title='DelveSiteDomainId',
+    ),
+]
 
 
-class DelveSiteDomainIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded DelveSiteDomainId that can be used to match multiple DelveSiteDomain objects.',
-            pattern='^delve_site_domain:((?:[a-z][a-z0-9_]*|\\*)\\/[a-z][a-z0-9_]*|\\/\\*|\\/\\*\\*)$',
-            title='DelveSiteDomainIdWildcard',
-        ),
-    ]
+DelveSiteDomainIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded DelveSiteDomainId that can be used to match multiple DelveSiteDomain objects.',
+    pattern='^delve_site_domain:((?:[a-z][a-z0-9_]*|\\*)\\/[a-z][a-z0-9_]*|\\/\\*|\\/\\*\\*)$',
+    title='DelveSiteDomainIdWildcard',
+    ),
+]
 
 
-class DelveSiteId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing a DelveSite object.',
-            pattern='^delve_site:([a-z][a-z0-9_]*\\/[a-z][a-z0-9_]*)$',
-            title='DelveSiteId',
-        ),
-    ]
+DelveSiteId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing a DelveSite object.',
+    pattern='^delve_site:([a-z][a-z0-9_]*\\/[a-z][a-z0-9_]*)$',
+    title='DelveSiteId',
+    ),
+]
 
 
-class DelveSiteIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded DelveSiteId that can be used to match multiple DelveSite objects.',
-            pattern='^delve_site:((?:[a-z][a-z0-9_]*|\\*)\\/[a-z][a-z0-9_]*|\\/\\*|\\/\\*\\*)$',
-            title='DelveSiteIdWildcard',
-        ),
-    ]
+DelveSiteIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded DelveSiteId that can be used to match multiple DelveSite objects.',
+    pattern='^delve_site:((?:[a-z][a-z0-9_]*|\\*)\\/[a-z][a-z0-9_]*|\\/\\*|\\/\\*\\*)$',
+    title='DelveSiteIdWildcard',
+    ),
+]
 
 
-class DelveSiteThemeDangerId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing a DelveSiteThemeDanger object.',
-            pattern='^delve_site_theme\\.danger:([a-z][a-z0-9_]*\\/[a-z][a-z0-9_]*)\\.(\\d+)$',
-            title='DelveSiteThemeDangerId',
-        ),
-    ]
+DelveSiteThemeDangerId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing a DelveSiteThemeDanger object.',
+    pattern='^delve_site_theme\\.danger:([a-z][a-z0-9_]*\\/[a-z][a-z0-9_]*)\\.(\\d+)$',
+    title='DelveSiteThemeDangerId',
+    ),
+]
 
 
-class DelveSiteThemeDangerIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded DelveSiteThemeDangerId that can be used to match multiple DelveSiteThemeDanger objects.',
-            pattern='^delve_site_theme\\.danger:((?:[a-z][a-z0-9_]*|\\*)\\/[a-z][a-z0-9_]*|\\/\\*|\\/\\*\\*)\\.(\\d+|\\*)$',
-            title='DelveSiteThemeDangerIdWildcard',
-        ),
-    ]
+DelveSiteThemeDangerIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded DelveSiteThemeDangerId that can be used to match multiple DelveSiteThemeDanger objects.',
+    pattern='^delve_site_theme\\.danger:((?:[a-z][a-z0-9_]*|\\*)\\/[a-z][a-z0-9_]*|\\/\\*|\\/\\*\\*)\\.(\\d+|\\*)$',
+    title='DelveSiteThemeDangerIdWildcard',
+    ),
+]
 
 
-class DelveSiteThemeFeatureId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing a DelveSiteThemeFeature object.',
-            pattern='^delve_site_theme\\.feature:([a-z][a-z0-9_]*\\/[a-z][a-z0-9_]*)\\.(\\d+)$',
-            title='DelveSiteThemeFeatureId',
-        ),
-    ]
+DelveSiteThemeFeatureId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing a DelveSiteThemeFeature object.',
+    pattern='^delve_site_theme\\.feature:([a-z][a-z0-9_]*\\/[a-z][a-z0-9_]*)\\.(\\d+)$',
+    title='DelveSiteThemeFeatureId',
+    ),
+]
 
 
-class DelveSiteThemeFeatureIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded DelveSiteThemeFeatureId that can be used to match multiple DelveSiteThemeFeature objects.',
-            pattern='^delve_site_theme\\.feature:((?:[a-z][a-z0-9_]*|\\*)\\/[a-z][a-z0-9_]*|\\/\\*|\\/\\*\\*)\\.(\\d+|\\*)$',
-            title='DelveSiteThemeFeatureIdWildcard',
-        ),
-    ]
+DelveSiteThemeFeatureIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded DelveSiteThemeFeatureId that can be used to match multiple DelveSiteThemeFeature objects.',
+    pattern='^delve_site_theme\\.feature:((?:[a-z][a-z0-9_]*|\\*)\\/[a-z][a-z0-9_]*|\\/\\*|\\/\\*\\*)\\.(\\d+|\\*)$',
+    title='DelveSiteThemeFeatureIdWildcard',
+    ),
+]
 
 
-class DelveSiteThemeId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing a DelveSiteTheme object.',
-            pattern='^delve_site_theme:([a-z][a-z0-9_]*\\/[a-z][a-z0-9_]*)$',
-            title='DelveSiteThemeId',
-        ),
-    ]
+DelveSiteThemeId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing a DelveSiteTheme object.',
+    pattern='^delve_site_theme:([a-z][a-z0-9_]*\\/[a-z][a-z0-9_]*)$',
+    title='DelveSiteThemeId',
+    ),
+]
 
 
-class DelveSiteThemeIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded DelveSiteThemeId that can be used to match multiple DelveSiteTheme objects.',
-            pattern='^delve_site_theme:((?:[a-z][a-z0-9_]*|\\*)\\/[a-z][a-z0-9_]*|\\/\\*|\\/\\*\\*)$',
-            title='DelveSiteThemeIdWildcard',
-        ),
-    ]
+DelveSiteThemeIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded DelveSiteThemeId that can be used to match multiple DelveSiteTheme objects.',
+    pattern='^delve_site_theme:((?:[a-z][a-z0-9_]*|\\*)\\/[a-z][a-z0-9_]*|\\/\\*|\\/\\*\\*)$',
+    title='DelveSiteThemeIdWildcard',
+    ),
+]
 
 
-class DiceExpression(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A simple dice roll expression with an optional (positive or negative) modifer.',
-            examples=['1d100', '1d6+2', '2d10'],
-            pattern='([1-9][0-9]*)d([1-9][0-9]*)([+-]([1-9][0-9]*))?',
-            title='DiceExpression',
-        ),
-    ]
+DiceExpression: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A simple dice roll expression with an optional (positive or negative) modifer.',
+    examples=['1d100', '1d6+2', '2d10'],
+    pattern='([1-9][0-9]*)d([1-9][0-9]*)([+-]([1-9][0-9]*))?',
+    title='DiceExpression',
+    ),
+]
 
 
 class DiceRange(BaseModel):
@@ -580,15 +543,14 @@ class DiceRange(BaseModel):
     max: Annotated[int, Field(description='High end of the dice range.')]
 
 
-class DictKey(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A `snake_case` key used in a Datasworn dictionary object.',
-            pattern='^[a-z][a-z0-9_]*$',
-            title='DictKey',
-        ),
-    ]
+DictKey: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A `snake_case` key used in a Datasworn dictionary object.',
+    pattern='^[a-z][a-z0-9_]*$',
+    title='DictKey',
+    ),
+]
 
 
 class RollType(Enum):
@@ -605,15 +567,14 @@ class EmbeddedMove(BaseModel):
     roll_type: RollType
 
 
-class EmbeddedMoveIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded AssetAbilityMoveId that can be used to match multiple AssetAbilityMove objects.',
-            pattern='^asset\\.ability\\.move:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})\\.(\\d+|\\*)\\.([a-z][a-z0-9_]*|\\*)$',
-            title='EmbeddedMoveIdWildcard',
-        ),
-    ]
+EmbeddedMoveIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded AssetAbilityMoveId that can be used to match multiple AssetAbilityMove objects.',
+    pattern='^asset\\.ability\\.move:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})\\.(\\d+|\\*)\\.([a-z][a-z0-9_]*|\\*)$',
+    title='EmbeddedMoveIdWildcard',
+    ),
+]
 
 
 class RecommendedRolls(BaseModel):
@@ -630,11 +591,10 @@ class OracleType(Enum):
     column_text3 = 'column_text3'
 
 
-class EmbeddedOracleRollable(BaseModel):
-    model_config = ConfigDict(
-        extra='allow',
-    )
-    oracle_type: OracleType
+EmbeddedOracleRollable: TypeAlias = Annotated[
+    Union["EmbeddedOracleColumnText", "EmbeddedOracleColumnText2", "EmbeddedOracleColumnText3", "EmbeddedOracleTableText", "EmbeddedOracleTableText2", "EmbeddedOracleTableText3"],
+    Field(discriminator="oracle_type"),
+]
 
 
 class EmbedOnlyType(Enum):
@@ -649,81 +609,74 @@ class EmbedOnlyType(Enum):
     variant = 'variant'
 
 
-class ExpansionId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='The ID of a Datasworn package that relies on an external package to provide its ruleset.',
-            examples=['delve', 'sundered_isles'],
-            pattern='^[a-z][a-z0-9_]*$',
-            title='ExpansionId',
-        ),
-    ]
+ExpansionId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='The ID of a Datasworn package that relies on an external package to provide its ruleset.',
+    examples=['delve', 'sundered_isles'],
+    pattern='^[a-z][a-z0-9_]*$',
+    title='ExpansionId',
+    ),
+]
 
 
 class Tags(BaseModel):
     core: Annotated[CoreTags | None, Field(alias='_core')] = None
 
 
-class MarkdownTemplateString(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A rich text string in Markdown with replaced values from oracle roll results.\n\nThe custom syntax `{{some_row_key>some_oracle_table_id}}` should be replaced by the `some_row_key` string of a rolled oracle table. This is usually the `text` key, for example `{{text>oracle_rollable:starforged/core/action}}`\n',
-            title='MarkdownTemplateString',
-        ),
-    ]
+MarkdownTemplateString: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A rich text string in Markdown with replaced values from oracle roll results.\n\nThe custom syntax `{{some_row_key>some_oracle_table_id}}` should be replaced by the `some_row_key` string of a rolled oracle table. This is usually the `text` key, for example `{{text>oracle_rollable:starforged/core/action}}`\n',
+    title='MarkdownTemplateString',
+    ),
+]
 
 
-class Move(BaseModel):
-    model_config = ConfigDict(
-        extra='allow',
-    )
-    roll_type: RollType
+Move: TypeAlias = Annotated[
+    Union["MoveActionRoll", "MoveNoRoll", "MoveProgressRoll", "MoveSpecialTrack"],
+    Field(discriminator="roll_type"),
+]
 
 
-class MoveCategoryId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing a MoveCategory object.',
-            pattern='^move_category:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){1,4})$',
-            title='MoveCategoryId',
-        ),
-    ]
+MoveCategoryId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing a MoveCategory object.',
+    pattern='^move_category:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){1,4})$',
+    title='MoveCategoryId',
+    ),
+]
 
 
-class MoveCategoryIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded MoveCategoryId that can be used to match multiple MoveCategory objects.',
-            pattern='^move_category:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){1,4})$',
-            title='MoveCategoryIdWildcard',
-        ),
-    ]
+MoveCategoryIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded MoveCategoryId that can be used to match multiple MoveCategory objects.',
+    pattern='^move_category:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){1,4})$',
+    title='MoveCategoryIdWildcard',
+    ),
+]
 
 
-class MoveConditionId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing a MoveCondition object.',
-            pattern='^move\\.condition:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})\\.(\\d+)$',
-            title='MoveConditionId',
-        ),
-    ]
+MoveConditionId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing a MoveCondition object.',
+    pattern='^move\\.condition:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})\\.(\\d+)$',
+    title='MoveConditionId',
+    ),
+]
 
 
-class MoveConditionIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded MoveConditionId that can be used to match multiple MoveCondition objects.',
-            pattern='^move\\.condition:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})\\.(\\d+|\\*)$',
-            title='MoveConditionIdWildcard',
-        ),
-    ]
+MoveConditionIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded MoveConditionId that can be used to match multiple MoveCondition objects.',
+    pattern='^move\\.condition:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})\\.(\\d+|\\*)$',
+    title='MoveConditionIdWildcard',
+    ),
+]
 
 
 class MoveEnhancement(BaseModel):
@@ -733,92 +686,84 @@ class MoveEnhancement(BaseModel):
     roll_type: RollType
 
 
-class MoveId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing a Move object.',
-            pattern='^move:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})$',
-            title='MoveId',
-        ),
-    ]
+MoveId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing a Move object.',
+    pattern='^move:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})$',
+    title='MoveId',
+    ),
+]
 
 
-class MoveIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded MoveId that can be used to match multiple Move objects.',
-            pattern='^move:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})$',
-            title='MoveIdWildcard',
-        ),
-    ]
+MoveIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded MoveId that can be used to match multiple Move objects.',
+    pattern='^move:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})$',
+    title='MoveIdWildcard',
+    ),
+]
 
 
-class MoveOracleRollableId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing a MoveOracleRollable object.',
-            pattern='^move\\.oracle_rollable:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})\\.([a-z][a-z0-9_]*|\\*)$',
-            title='MoveOracleRollableId',
-        ),
-    ]
+MoveOracleRollableId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing a MoveOracleRollable object.',
+    pattern='^move\\.oracle_rollable:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})\\.([a-z][a-z0-9_]*|\\*)$',
+    title='MoveOracleRollableId',
+    ),
+]
 
 
-class MoveOracleRollableIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded MoveOracleRollableId that can be used to match multiple MoveOracleRollable objects.',
-            pattern='^move\\.oracle_rollable:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})\\.([a-z][a-z0-9_]*|\\*)$',
-            title='MoveOracleRollableIdWildcard',
-        ),
-    ]
+MoveOracleRollableIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded MoveOracleRollableId that can be used to match multiple MoveOracleRollable objects.',
+    pattern='^move\\.oracle_rollable:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})\\.([a-z][a-z0-9_]*|\\*)$',
+    title='MoveOracleRollableIdWildcard',
+    ),
+]
 
 
-class MoveOracleRollableRowId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing a MoveOracleRollableRow object.',
-            pattern='^move\\.oracle_rollable\\.row:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})\\.([a-z][a-z0-9_]*|\\*)\\.(\\d+)$',
-            title='MoveOracleRollableRowId',
-        ),
-    ]
+MoveOracleRollableRowId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing a MoveOracleRollableRow object.',
+    pattern='^move\\.oracle_rollable\\.row:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})\\.([a-z][a-z0-9_]*|\\*)\\.(\\d+)$',
+    title='MoveOracleRollableRowId',
+    ),
+]
 
 
-class MoveOracleRollableRowIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded MoveOracleRollableRowId that can be used to match multiple MoveOracleRollableRow objects.',
-            pattern='^move\\.oracle_rollable\\.row:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})\\.([a-z][a-z0-9_]*|\\*)\\.(\\d+|\\*)$',
-            title='MoveOracleRollableRowIdWildcard',
-        ),
-    ]
+MoveOracleRollableRowIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded MoveOracleRollableRowId that can be used to match multiple MoveOracleRollableRow objects.',
+    pattern='^move\\.oracle_rollable\\.row:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})\\.([a-z][a-z0-9_]*|\\*)\\.(\\d+|\\*)$',
+    title='MoveOracleRollableRowIdWildcard',
+    ),
+]
 
 
-class MoveOutcomeId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing a MoveOutcome object.',
-            pattern='^move\\.outcome:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})\\.([a-z][a-z0-9_]*|\\*)$',
-            title='MoveOutcomeId',
-        ),
-    ]
+MoveOutcomeId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing a MoveOutcome object.',
+    pattern='^move\\.outcome:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})\\.([a-z][a-z0-9_]*|\\*)$',
+    title='MoveOutcomeId',
+    ),
+]
 
 
-class MoveOutcomeIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded MoveOutcomeId that can be used to match multiple MoveOutcome objects.',
-            pattern='^move\\.outcome:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})\\.([a-z][a-z0-9_]*|\\*)$',
-            title='MoveOutcomeIdWildcard',
-        ),
-    ]
+MoveOutcomeIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded MoveOutcomeId that can be used to match multiple MoveOutcome objects.',
+    pattern='^move\\.outcome:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})\\.([a-z][a-z0-9_]*|\\*)$',
+    title='MoveOutcomeIdWildcard',
+    ),
+]
 
 
 class MoveRollType(Enum):
@@ -836,70 +781,64 @@ class NonCollectableType(Enum):
     truth = 'truth'
 
 
-class NpcCollectionId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing a NpcCollection object.',
-            pattern='^npc_collection:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){1,4})$',
-            title='NpcCollectionId',
-        ),
-    ]
+NpcCollectionId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing a NpcCollection object.',
+    pattern='^npc_collection:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){1,4})$',
+    title='NpcCollectionId',
+    ),
+]
 
 
-class NpcCollectionIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded NpcCollectionId that can be used to match multiple NpcCollection objects.',
-            pattern='^npc_collection:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){1,4})$',
-            title='NpcCollectionIdWildcard',
-        ),
-    ]
+NpcCollectionIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded NpcCollectionId that can be used to match multiple NpcCollection objects.',
+    pattern='^npc_collection:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){1,4})$',
+    title='NpcCollectionIdWildcard',
+    ),
+]
 
 
-class NpcId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing a Npc object.',
-            pattern='^npc:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})$',
-            title='NpcId',
-        ),
-    ]
+NpcId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing a Npc object.',
+    pattern='^npc:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})$',
+    title='NpcId',
+    ),
+]
 
 
-class NpcIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded NpcId that can be used to match multiple Npc objects.',
-            pattern='^npc:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})$',
-            title='NpcIdWildcard',
-        ),
-    ]
+NpcIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded NpcId that can be used to match multiple Npc objects.',
+    pattern='^npc:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})$',
+    title='NpcIdWildcard',
+    ),
+]
 
 
-class NpcVariantId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing a NpcVariant object.',
-            pattern='^npc\\.variant:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})\\.([a-z][a-z0-9_]*|\\*)$',
-            title='NpcVariantId',
-        ),
-    ]
+NpcVariantId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing a NpcVariant object.',
+    pattern='^npc\\.variant:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})\\.([a-z][a-z0-9_]*|\\*)$',
+    title='NpcVariantId',
+    ),
+]
 
 
-class NpcVariantIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded NpcVariantId that can be used to match multiple NpcVariant objects.',
-            pattern='^npc\\.variant:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})\\.([a-z][a-z0-9_]*|\\*)$',
-            title='NpcVariantIdWildcard',
-        ),
-    ]
+NpcVariantIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded NpcVariantId that can be used to match multiple NpcVariant objects.',
+    pattern='^npc\\.variant:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})\\.([a-z][a-z0-9_]*|\\*)$',
+    title='NpcVariantIdWildcard',
+    ),
+]
 
 
 class OracleType1(Enum):
@@ -910,33 +849,30 @@ class OracleType1(Enum):
     table_shared_text3 = 'table_shared_text3'
 
 
-class OracleCollection(BaseModel):
-    model_config = ConfigDict(
-        extra='allow',
-    )
-    oracle_type: OracleType1
+OracleCollection: TypeAlias = Annotated[
+    Union["OracleTablesCollection", "OracleTableSharedRolls", "OracleTableSharedText", "OracleTableSharedText2", "OracleTableSharedText3"],
+    Field(discriminator="oracle_type"),
+]
 
 
-class OracleCollectionId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing an OracleCollection object.',
-            pattern='^oracle_collection:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){1,4})$',
-            title='OracleCollectionId',
-        ),
-    ]
+OracleCollectionId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing an OracleCollection object.',
+    pattern='^oracle_collection:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){1,4})$',
+    title='OracleCollectionId',
+    ),
+]
 
 
-class OracleCollectionIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded OracleCollectionId that can be used to match multiple OracleCollection objects.',
-            pattern='^oracle_collection:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){1,4})$',
-            title='OracleCollectionIdWildcard',
-        ),
-    ]
+OracleCollectionIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded OracleCollectionId that can be used to match multiple OracleCollection objects.',
+    pattern='^oracle_collection:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){1,4})$',
+    title='OracleCollectionIdWildcard',
+    ),
+]
 
 
 class OracleDuplicateBehavior(Enum):
@@ -964,55 +900,50 @@ class OracleType2(Enum):
     column_text3 = 'column_text3'
 
 
-class OracleRollable(BaseModel):
-    model_config = ConfigDict(
-        extra='allow',
-    )
-    oracle_type: OracleType2
+OracleRollable: TypeAlias = Annotated[
+    Union["OracleColumnText", "OracleColumnText2", "OracleColumnText3", "OracleTableText", "OracleTableText2", "OracleTableText3"],
+    Field(discriminator="oracle_type"),
+]
 
 
-class OracleRollableId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing an OracleRollable object.',
-            pattern='^oracle_rollable:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})$',
-            title='OracleRollableId',
-        ),
-    ]
+OracleRollableId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing an OracleRollable object.',
+    pattern='^oracle_rollable:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})$',
+    title='OracleRollableId',
+    ),
+]
 
 
-class OracleRollableIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded OracleRollableId that can be used to match multiple OracleRollable objects.',
-            pattern='^oracle_rollable:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})$',
-            title='OracleRollableIdWildcard',
-        ),
-    ]
+OracleRollableIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded OracleRollableId that can be used to match multiple OracleRollable objects.',
+    pattern='^oracle_rollable:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})$',
+    title='OracleRollableIdWildcard',
+    ),
+]
 
 
-class OracleRollableRowId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing an OracleRollableRow object.',
-            pattern='^oracle_rollable\\.row:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})\\.(\\d+)$',
-            title='OracleRollableRowId',
-        ),
-    ]
+OracleRollableRowId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing an OracleRollableRow object.',
+    pattern='^oracle_rollable\\.row:([a-z][a-z0-9_]*(?:\\/[a-z][a-z0-9_]*){2,5})\\.(\\d+)$',
+    title='OracleRollableRowId',
+    ),
+]
 
 
-class OracleRollableRowIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded OracleRollableRowId that can be used to match multiple OracleRollableRow objects.',
-            pattern='^oracle_rollable\\.row:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})\\.(\\d+|\\*)$',
-            title='OracleRollableRowIdWildcard',
-        ),
-    ]
+OracleRollableRowIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded OracleRollableRowId that can be used to match multiple OracleRollableRow objects.',
+    pattern='^oracle_rollable\\.row:((?:[a-z][a-z0-9_]*|\\*)(?:\\/(?:[a-z][a-z0-9_]*|\\*|\\*\\*)){2,5})\\.(\\d+|\\*)$',
+    title='OracleRollableRowIdWildcard',
+    ),
+]
 
 
 class Template(BaseModel):
@@ -1048,11 +979,10 @@ class OracleType3(Enum):
     table_text3 = 'table_text3'
 
 
-class OracleRollableTable(BaseModel):
-    model_config = ConfigDict(
-        extra='allow',
-    )
-    oracle_type: OracleType3
+OracleRollableTable: TypeAlias = Annotated[
+    Union["OracleTableText", "OracleTableText2", "OracleTableText3"],
+    Field(discriminator="oracle_type"),
+]
 
 
 class OracleRollTemplate(BaseModel):
@@ -1259,26 +1189,24 @@ class ProgressTrackTypeInfo(BaseModel):
     controls: dict[str, dict[str, Any]] | None = {}
 
 
-class RarityId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing a Rarity object.',
-            pattern='^rarity:([a-z][a-z0-9_]*\\/[a-z][a-z0-9_]*)$',
-            title='RarityId',
-        ),
-    ]
+RarityId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing a Rarity object.',
+    pattern='^rarity:([a-z][a-z0-9_]*\\/[a-z][a-z0-9_]*)$',
+    title='RarityId',
+    ),
+]
 
 
-class RarityIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded RarityId that can be used to match multiple Rarity objects.',
-            pattern='^rarity:((?:[a-z][a-z0-9_]*|\\*)\\/[a-z][a-z0-9_]*|\\/\\*|\\/\\*\\*)$',
-            title='RarityIdWildcard',
-        ),
-    ]
+RarityIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded RarityId that can be used to match multiple Rarity objects.',
+    pattern='^rarity:((?:[a-z][a-z0-9_]*|\\*)\\/[a-z][a-z0-9_]*|\\/\\*|\\/\\*\\*)$',
+    title='RarityIdWildcard',
+    ),
+]
 
 
 class Using(Enum):
@@ -1298,16 +1226,15 @@ class RollableValue(BaseModel):
     using: Using
 
 
-class RulesetId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='The ID of standalone Datasworn package that describes its own ruleset.',
-            examples=['classic', 'starforged'],
-            pattern='^[a-z][a-z0-9_]*$',
-            title='RulesetId',
-        ),
-    ]
+RulesetId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='The ID of standalone Datasworn package that describes its own ruleset.',
+    examples=['classic', 'starforged'],
+    pattern='^[a-z][a-z0-9_]*$',
+    title='RulesetId',
+    ),
+]
 
 
 class Type(Enum):
@@ -1352,14 +1279,13 @@ class SelectValueFieldChoice(BaseModel):
     using: Using
 
 
-class SemanticVersion(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            pattern='^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$',
-            title='SemanticVersion',
-        ),
-    ]
+SemanticVersion: TypeAlias = Annotated[
+    str,
+    Field(
+    pattern='^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$',
+    title='SemanticVersion',
+    ),
+]
 
 
 class SpecialTrackRollMethod(Enum):
@@ -1745,103 +1671,94 @@ class TriggerSpecialTrackConditionOption(BaseModel):
     ]
 
 
-class TruthId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing a Truth object.',
-            pattern='^truth:([a-z][a-z0-9_]*\\/[a-z][a-z0-9_]*)$',
-            title='TruthId',
-        ),
-    ]
+TruthId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing a Truth object.',
+    pattern='^truth:([a-z][a-z0-9_]*\\/[a-z][a-z0-9_]*)$',
+    title='TruthId',
+    ),
+]
 
 
-class TruthIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded TruthId that can be used to match multiple Truth objects.',
-            pattern='^truth:((?:[a-z][a-z0-9_]*|\\*)\\/[a-z][a-z0-9_]*|\\/\\*|\\/\\*\\*)$',
-            title='TruthIdWildcard',
-        ),
-    ]
+TruthIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded TruthId that can be used to match multiple Truth objects.',
+    pattern='^truth:((?:[a-z][a-z0-9_]*|\\*)\\/[a-z][a-z0-9_]*|\\/\\*|\\/\\*\\*)$',
+    title='TruthIdWildcard',
+    ),
+]
 
 
-class TruthOptionId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing a TruthOption object.',
-            pattern='^truth\\.option:([a-z][a-z0-9_]*\\/[a-z][a-z0-9_]*)\\.(\\d+)$',
-            title='TruthOptionId',
-        ),
-    ]
+TruthOptionId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing a TruthOption object.',
+    pattern='^truth\\.option:([a-z][a-z0-9_]*\\/[a-z][a-z0-9_]*)\\.(\\d+)$',
+    title='TruthOptionId',
+    ),
+]
 
 
-class TruthOptionIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded TruthOptionId that can be used to match multiple TruthOption objects.',
-            pattern='^truth\\.option:((?:[a-z][a-z0-9_]*|\\*)\\/[a-z][a-z0-9_]*|\\/\\*|\\/\\*\\*)\\.(\\d+|\\*)$',
-            title='TruthOptionIdWildcard',
-        ),
-    ]
+TruthOptionIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded TruthOptionId that can be used to match multiple TruthOption objects.',
+    pattern='^truth\\.option:((?:[a-z][a-z0-9_]*|\\*)\\/[a-z][a-z0-9_]*|\\/\\*|\\/\\*\\*)\\.(\\d+|\\*)$',
+    title='TruthOptionIdWildcard',
+    ),
+]
 
 
-class TruthOptionOracleRollableId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing a TruthOptionOracleRollable object.',
-            pattern='^truth\\.option\\.oracle_rollable:([a-z][a-z0-9_]*\\/[a-z][a-z0-9_]*)\\.(\\d+)\\.([a-z][a-z0-9_]*|\\*)$',
-            title='TruthOptionOracleRollableId',
-        ),
-    ]
+TruthOptionOracleRollableId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing a TruthOptionOracleRollable object.',
+    pattern='^truth\\.option\\.oracle_rollable:([a-z][a-z0-9_]*\\/[a-z][a-z0-9_]*)\\.(\\d+)\\.([a-z][a-z0-9_]*|\\*)$',
+    title='TruthOptionOracleRollableId',
+    ),
+]
 
 
-class TruthOptionOracleRollableIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded TruthOptionOracleRollableId that can be used to match multiple TruthOptionOracleRollable objects.',
-            pattern='^truth\\.option\\.oracle_rollable:((?:[a-z][a-z0-9_]*|\\*)\\/[a-z][a-z0-9_]*|\\/\\*|\\/\\*\\*)\\.(\\d+|\\*)\\.([a-z][a-z0-9_]*|\\*)$',
-            title='TruthOptionOracleRollableIdWildcard',
-        ),
-    ]
+TruthOptionOracleRollableIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded TruthOptionOracleRollableId that can be used to match multiple TruthOptionOracleRollable objects.',
+    pattern='^truth\\.option\\.oracle_rollable:((?:[a-z][a-z0-9_]*|\\*)\\/[a-z][a-z0-9_]*|\\/\\*|\\/\\*\\*)\\.(\\d+|\\*)\\.([a-z][a-z0-9_]*|\\*)$',
+    title='TruthOptionOracleRollableIdWildcard',
+    ),
+]
 
 
-class TruthOptionOracleRollableRowId(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A unique ID representing a TruthOptionOracleRollableRow object.',
-            pattern='^truth\\.option\\.oracle_rollable\\.row:([a-z][a-z0-9_]*\\/[a-z][a-z0-9_]*)\\.(\\d+)\\.([a-z][a-z0-9_]*|\\*)\\.(\\d+)$',
-            title='TruthOptionOracleRollableRowId',
-        ),
-    ]
+TruthOptionOracleRollableRowId: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A unique ID representing a TruthOptionOracleRollableRow object.',
+    pattern='^truth\\.option\\.oracle_rollable\\.row:([a-z][a-z0-9_]*\\/[a-z][a-z0-9_]*)\\.(\\d+)\\.([a-z][a-z0-9_]*|\\*)\\.(\\d+)$',
+    title='TruthOptionOracleRollableRowId',
+    ),
+]
 
 
-class TruthOptionOracleRollableRowIdWildcard(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A wildcarded TruthOptionOracleRollableRowId that can be used to match multiple TruthOptionOracleRollableRow objects.',
-            pattern='^truth\\.option\\.oracle_rollable\\.row:((?:[a-z][a-z0-9_]*|\\*)\\/[a-z][a-z0-9_]*|\\/\\*|\\/\\*\\*)\\.(\\d+|\\*)\\.([a-z][a-z0-9_]*|\\*)\\.(\\d+|\\*)$',
-            title='TruthOptionOracleRollableRowIdWildcard',
-        ),
-    ]
+TruthOptionOracleRollableRowIdWildcard: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A wildcarded TruthOptionOracleRollableRowId that can be used to match multiple TruthOptionOracleRollableRow objects.',
+    pattern='^truth\\.option\\.oracle_rollable\\.row:((?:[a-z][a-z0-9_]*|\\*)\\/[a-z][a-z0-9_]*|\\/\\*|\\/\\*\\*)\\.(\\d+|\\*)\\.([a-z][a-z0-9_]*|\\*)\\.(\\d+|\\*)$',
+    title='TruthOptionOracleRollableRowIdWildcard',
+    ),
+]
 
 
-class WebpImageUrl(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A relative (local) URL pointing to a raster image in the WEBP format.',
-            pattern='\\.webp$',
-            title='WebpImageUrl',
-        ),
-    ]
+WebpImageUrl: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A relative (local) URL pointing to a raster image in the WEBP format.',
+    pattern='\\.webp$',
+    title='WebpImageUrl',
+    ),
+]
 
 
 class DataswornV010(RootModel[RulesPackage]):
@@ -2308,16 +2225,15 @@ class ConditionMeterField(BaseModel):
     ] = None
 
 
-class ConditionMeterKey(RootModel[str]):
-    root: Annotated[
-        str,
-        Field(
-            description='A basic, rollable player character resource specified by the ruleset.',
-            examples=['health', 'spirit', 'supply'],
-            pattern='^[a-z][a-z0-9_]*$',
-            title='ConditionMeterKey',
-        ),
-    ]
+ConditionMeterKey: TypeAlias = Annotated[
+    str,
+    Field(
+    description='A basic, rollable player character resource specified by the ruleset.',
+    examples=['health', 'spirit', 'supply'],
+    pattern='^[a-z][a-z0-9_]*$',
+    title='ConditionMeterKey',
+    ),
+]
 
 
 class ConditionMeterRule(BaseModel):
