@@ -30,25 +30,26 @@ def test_ruleset_id_is_a_string_alias():
 
 
 def test_root_model_str_wrappers_gone():
-    """No `<Name>(RootModel[str])` classes should survive post-processing.
+    """No literal `class <Name>(RootModel[str])` blocks should survive
+    post-processing.
 
-    `RootModel[Union[...]]` wrappers (e.g. `AnyId`) are deliberately left as
-    classes — union-of-strings isn't representable as a plain type alias, so
-    the post-processor leaves those alone.
+    Checks the *source* of models.py rather than runtime shape — a wrapper
+    like `ConditionMeterKey(RootModel[DictKey])` collapses to `RootModel[str]`
+    at runtime because `DictKey: TypeAlias = Annotated[str, …]`, but the
+    post-processor only targets the literal `RootModel[str]` pattern that
+    covers every `type: string` ID in the schema. Wrappers around named
+    str-shaped aliases (`DictKey`, `Label`, `EmailStr`, `AnyUrl`) are
+    deliberately left alone; there aren't many, and their ergonomics tax
+    (`.root` access) is negligible compared to the ID types.
     """
-    import inspect
+    import re
+    from pathlib import Path
 
-    from pydantic import RootModel
-
-    for name, obj in inspect.getmembers(models):
-        if not (inspect.isclass(obj) and issubclass(obj, RootModel) and obj is not RootModel):
-            continue
-        # `RootModel[str]` wrappers have `model_fields["root"].annotation is str`.
-        # Union wrappers have something more complex.
-        root_annotation = obj.model_fields["root"].annotation
-        assert root_annotation is not str, (
-            f"{name} is a RootModel[str] wrapper — expected TypeAlias"
-        )
+    source = Path(models.__file__).read_text(encoding="utf-8")
+    hits = re.findall(r"^class (\w+)\(RootModel\[str\]\):", source, re.MULTILINE)
+    assert not hits, (
+        f"post-processor left {len(hits)} `RootModel[str]` wrapper(s): {hits}"
+    )
 
 
 def test_discriminated_union_bases_gone():

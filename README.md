@@ -45,9 +45,11 @@ Functional against Pydantic 2.13. Four codegen quirks from `datamodel-code-gener
 3. **`RootModel[str]` wrappers on ID types.** Every `<ThingId>` was a wrapper class forcing `some_thing.id.root`; converted to `TypeAlias = Annotated[str, Field(pattern=…)]` so `.id` reads as a plain str while Pydantic still validates the pattern on load.
 4. **Empty discriminated-union bases.** `Move`, `OracleRollable`, `OracleRollableTable`, `EmbeddedOracleRollable`, `OracleCollection` were empty base classes with `extra='allow'`; rewritten to `Annotated[Union[...], Field(discriminator=…)]` unions so real fields are attributes, not `__pydantic_extra__`.
 
-### Known drift ⚠️
+### Schema line
 
-`models.py` here was regenerated from **schema line 0.1.0**. The content repos ship **schema 0.2.0** on `main`. Loading a live content payload today fails validation on `datasworn_version` (and probably a lot more). Fixing this = **regenerate `models.py` against the current `@datasworn-community/core` schema, then re-run the post-processor**. The end-to-end validation tests in `tests/test_load_rules_packages.py` are marked `xfail` until that happens; when the regen lands they should flip to green and the `xfail` markers should be removed.
+`models.py` here was regenerated from **schema line 0.2.0** — the same line the content repos currently ship on `main`. End-to-end validation tests fetch live content on first run and pass against all official rulesets (`classic`, `delve`, `lodestar`, `starforged`, `sundered_isles`) plus community `ancient_wonders` and `fe_runners`.
+
+`ironsmith` and `starsmith` are `xfail`ed against **known content-quality bugs** in the community-content repo (option `[key]` values containing spaces, which don't match the `DictKey` pattern `^[a-z][a-z0-9_]*$`) — not drift, and not fixable on the Python side. Bugs to file against `datasworn-community/community-content`.
 
 Still outstanding (nice-to-have, not blocking):
 
@@ -68,17 +70,11 @@ Tests fetch the current content from `official-content` and `community-content` 
 
 When `@datasworn-community/core` bumps its schema line:
 
-1. Download the current source schema:
+1. Regenerate `models.py` with datamodel-code-generator directly from the current distribution schema (the shape content JSON validates against):
 
    ```sh
-   curl -sSL https://raw.githubusercontent.com/datasworn-community/datasworn/main/packages/core/json/datasworn-source.schema.json > /tmp/datasworn-source.schema.json
-   ```
-
-2. Regenerate `models.py` with datamodel-code-generator (or your preferred tool):
-
-   ```sh
-   uvx datamodel-code-generator \
-     --input /tmp/datasworn-source.schema.json \
+   uvx --from 'datamodel-code-generator[http]' datamodel-codegen \
+     --url https://raw.githubusercontent.com/datasworn-community/datasworn/main/packages/core/json/datasworn.schema.json \
      --input-file-type jsonschema \
      --output packages/core/src/datasworn/core/models.py \
      --output-model-type pydantic_v2.BaseModel \
@@ -86,13 +82,13 @@ When `@datasworn-community/core` bumps its schema line:
      --use-annotated
    ```
 
-3. Re-run the post-processor:
+2. Re-run the post-processor to apply the five rewrites (date-pattern strip, stub → list rewrite, RootModel[str] → TypeAlias, discriminated-union base resolution, `field_X` → `X` rename):
 
    ```sh
    uv run python scripts/post_process_models.py
    ```
 
-4. Run tests. The `xfail` markers on `test_load_rules_packages.py` should flip green — remove the markers, commit, publish a new core version.
+3. Run tests. `test_load_rules_packages.py` fetches live content on first run and validates against every ruleset — a green run confirms the regenerated models still match what the content repos ship. Bump `packages/core/pyproject.toml` and publish.
 
 ## Provenance
 

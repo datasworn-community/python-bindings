@@ -4,15 +4,10 @@
 `datasworn-community/official-content` and
 `datasworn-community/community-content` and caches under `tests/.cache/`.
 
-**Known drift:** the models.py bundled here was generated from an older
-schema line than the content repos currently ship. These tests are marked
-`xfail` until models.py is regenerated against the current
-`@datasworn-community/core` schema; when that happens they should start
-passing and the xfail markers should be removed.
-
 Fetching against `main` (rather than a pinned tag) means CI here will keep
 catching drift as soon as it happens rather than hiding behind stale
-fixtures.
+fixtures — the moment a content repo lands a shape our bundled models.py
+can't validate, this suite starts failing loudly.
 """
 
 import json
@@ -31,9 +26,14 @@ OFFICIAL_PACKAGES = [
 COMMUNITY_PACKAGES = [
     "ancient_wonders",
     "fe_runners",
-    "ironsmith",
-    "starsmith",
 ]
+
+# Known content-quality violations, NOT schema drift. These packages have
+# option `[key]` values with spaces (e.g. `"area of expertise"`) that don't
+# match the `DictKey` pattern `^[a-z][a-z0-9_]*$`. Bugs to file against the
+# content repos; keeping them xfail here so the suite stays a signal for
+# real regressions rather than a chronic red mark.
+CONTENT_BUGS = ["ironsmith", "starsmith"]
 
 
 def _load_and_assert(content_path, ruleset_name: str) -> None:
@@ -52,21 +52,21 @@ def _load_and_assert(content_path, ruleset_name: str) -> None:
     assert rules.type in ("ruleset", "expansion")
 
 
-@pytest.mark.xfail(
-    reason="models.py bundled here is on schema 0.1.0; content on main is on"
-    " 0.2.0. Regenerate models.py from the current core schema to unxfail.",
-    strict=False,
-)
 @pytest.mark.parametrize("ruleset_name", OFFICIAL_PACKAGES)
 def test_official(content_path, ruleset_name: str):
     _load_and_assert(content_path, ruleset_name)
 
 
-@pytest.mark.xfail(
-    reason="models.py bundled here is on schema 0.1.0; content on main is on"
-    " 0.2.0. Regenerate models.py from the current core schema to unxfail.",
-    strict=False,
-)
 @pytest.mark.parametrize("ruleset_name", COMMUNITY_PACKAGES)
 def test_community(content_path, ruleset_name: str):
+    _load_and_assert(content_path, ruleset_name)
+
+
+@pytest.mark.xfail(
+    reason="content-quality bug in the community-content repo (space in "
+    "DictKey option keys), not a bindings problem. See CONTENT_BUGS list.",
+    strict=True,
+)
+@pytest.mark.parametrize("ruleset_name", CONTENT_BUGS)
+def test_community_known_content_bugs(content_path, ruleset_name: str):
     _load_and_assert(content_path, ruleset_name)
