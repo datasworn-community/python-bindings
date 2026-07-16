@@ -50,12 +50,14 @@ Note: **PyPI package names use hyphens** (`datasworn-community-classic`) but **P
 
 ## Status
 
-Everything is functional, but there are known gaps to reconcile before the first PyPI release:
+Functional against Pydantic 2.13, all 10 packages tested. Two known codegen bugs from `datamodel-code-generator` are patched by `scripts/post_process_models.py` — run it after any `models.py` regeneration:
 
-- **Pydantic pinned `<2.13`.** Pydantic 2.13 tightened validation in two ways that the generated `models.py` isn't yet reconciled with:
-  1. `date` fields carry a string `pattern` constraint that 2.13 rejects (fix stripped from `models.py` for now — needs a proper generator fix so it doesn't come back on regeneration).
-  2. Delve's `site_domains.*.features` / `.dangers` are typed as models but the compiled JSON emits them as lists. Delve tests are marked `xfail` until this is resolved.
-- **`models.py` has not been post-processed** to convert `RootModel[str]` wrappers into plain type aliases. That's the ergonomic (`.id` vs `._id`) fix that was in a separate script on the upstream fork.
+1. **String `pattern` constraint on `date` fields.** `SourceInfo.date` is typed as `datetime.date` but the schema's `pattern: "[0-9]{4}-…"` is emitted onto the `Field()`. Pydantic 2.13 rejects a string-only constraint on a non-string field. The post-processor strips just those patterns.
+2. **Empty `Features` / `Dangers` / `Denizens` stubs.** Codegen emits `class Denizens(BaseModel): pass` and `class Features(BaseModel): pass`, then references them where the JSON actually contains a list of concrete items (`DelveSiteDenizen`, `DelveSiteDomainFeature`, `DelveSiteThemeFeature`, etc.). The post-processor rewrites the field types to `list[X]` and deletes the empty stubs.
+
+Still outstanding (nice-to-have, not blocking):
+
+- **`RootModel[str]` wrappers on ID types.** `.id` currently reads via `._id`; a separate post-process step in the upstream fork converted these to plain type aliases (`RulesetId: TypeAlias = str`). Not ported yet.
 
 ## Development
 

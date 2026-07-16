@@ -376,9 +376,6 @@ class CoreTags(BaseModel):
     ] = None
 
 
-class Denizens(BaseModel):
-    pass
-
 
 class DelveSiteDenizenFrequency(Enum):
     very_common = 'very_common'
@@ -410,12 +407,6 @@ class DelveSiteDenizenIdWildcard(RootModel[str]):
     ]
 
 
-class Features(BaseModel):
-    pass
-
-
-class Dangers(BaseModel):
-    pass
 
 
 class DelveSiteDomainDangerId(RootModel[str]):
@@ -3444,12 +3435,7 @@ class DelveSite(BaseModel):
             title='MarkdownString',
         ),
     ]
-    denizens: Annotated[
-        Denizens,
-        Field(
-            description="Represents the delve site's denizen matrix as an array of objects."
-        ),
-    ]
+    denizens: list[DelveSiteDenizen]
     type: Literal['delve_site']
 
 
@@ -3572,8 +3558,8 @@ class DelveSiteDomain(BaseModel):
             title='OracleRollableId',
         ),
     ] = None
-    features: Features
-    dangers: Dangers
+    features: list[DelveSiteDomainFeature]
+    dangers: list[DelveSiteDomainDanger]
     type: Literal['delve_site_domain']
 
 
@@ -3874,8 +3860,8 @@ class DelveSiteTheme(BaseModel):
             description='Optional extended description text.', title='MarkdownString'
         ),
     ] = None
-    features: Features
-    dangers: Dangers
+    features: list[DelveSiteThemeFeature]
+    dangers: list[DelveSiteThemeDanger]
     type: Literal['delve_site_theme']
 
 
