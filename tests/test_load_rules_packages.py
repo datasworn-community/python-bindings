@@ -26,14 +26,7 @@ COMMUNITY_PACKAGES = [
     "starsmith",
 ]
 
-# TODO: reconcile these against pydantic 2.13's stricter validation before
-# unpinning. See PROVENANCE.md / package.py notes for details.
-EXPECTED_FAILURES: set[str] = {
-    # delve: site_domains.*.features / .dangers are typed as models in the
-    # generated models.py but the compiled JSON emits them as lists — schema
-    # or generator bug we haven't tracked down yet.
-    "delve",
-}
+EXPECTED_FAILURES: set[str] = set()
 
 
 def _load(namespace: str, package_name: str) -> Ruleset | Expansion:
@@ -61,10 +54,8 @@ def _assert_shape(rules: Ruleset | Expansion, package_name: str) -> None:
 
 @pytest.mark.parametrize("package_name", OFFICIAL_PACKAGES)
 def test_official(package_name: str):
-    if package_name in EXPECTED_FAILURES:
-        pytest.xfail(
-            f"{package_name}: known validation drift vs. generated models"
-        )
+    if package_name in EXPECTED_FAILURES:  # pragma: no cover — kept for future drift
+        pytest.xfail(f"{package_name}: known validation drift vs. generated models")
     _assert_shape(_load("datasworn", package_name), package_name)
 
 

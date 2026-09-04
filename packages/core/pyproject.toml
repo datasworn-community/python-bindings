@@ -8,11 +8,11 @@ authors = [
 ]
 requires-python = ">=3.14"
 dependencies = [
-    # Pin <2.13 until the generated models.py is reconciled with 2.13's stricter
-    # validation: (a) `date` fields carry a string `pattern` constraint that 2.13
-    # rejects, and (b) several fields (e.g. delve site_domains.*.features) are
-    # typed as models but the compiled JSON emits them as lists. Bumping pydantic
-    # again should coincide with regenerating and post-processing models.py.
+    # 2.13 works because `scripts/post_process_models.py` rewrites two codegen
+    # bugs that 2.13 catches: string `pattern` constraints on `date` fields, and
+    # empty stub models where the generator should have emitted `list[X]`.
+    # Bumping past 2.13 requires re-running the post-processor after any
+    # models.py regeneration (see the script's docstring for details).
     "pydantic[email]>=2.13.4,<2.14",
 ]
 
